@@ -1,0 +1,170 @@
+@host = http://localhost:5095
+@token = paste-jwt-here
+@resumeId = 1
+@jobId = 1
+@matchId = 1
+
+GET {{host}}/api/system/status
+Accept: application/json
+
+###
+
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Sample User",
+  "email": "sample@skillmatch.local",
+  "password": "ChangeMe123!"
+}
+
+###
+
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "sample@skillmatch.local",
+  "password": "ChangeMe123!"
+}
+
+###
+
+GET {{host}}/api/users/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{host}}/api/resumes
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+POST {{host}}/api/resumes
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=SkillMatchBoundary
+
+--SkillMatchBoundary
+Content-Disposition: form-data; name="file"; filename="resume.pdf"
+Content-Type: application/pdf
+
+< ./resume.pdf
+--SkillMatchBoundary--
+
+###
+
+GET {{host}}/api/resumes/{{resumeId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{host}}/api/resumes/{{resumeId}}/file
+Authorization: Bearer {{token}}
+Accept: application/pdf
+
+###
+
+DELETE {{host}}/api/resumes/{{resumeId}}
+Authorization: Bearer {{token}}
+
+###
+
+POST {{host}}/api/resumes/{{resumeId}}/extract-skills
+Authorization: Bearer {{token}}
+
+###
+
+GET {{host}}/api/skills
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+POST {{host}}/api/skills/extract
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "text": "We need a .NET developer with React, SQL Server, Docker, Azure, and K8s experience."
+}
+
+###
+
+GET {{host}}/api/jobs
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+POST {{host}}/api/jobs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Full Stack Developer",
+  "company": "Example Company",
+  "description": "Build React applications and ASP.NET Core REST APIs using SQL Server, Docker, and Azure."
+}
+
+###
+
+GET {{host}}/api/jobs/{{jobId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+PUT {{host}}/api/jobs/{{jobId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Senior Full Stack Developer",
+  "company": "Example Company",
+  "description": "Build TypeScript and Angular applications backed by ASP.NET Core, PostgreSQL, and AWS."
+}
+
+###
+
+DELETE {{host}}/api/jobs/{{jobId}}
+Authorization: Bearer {{token}}
+
+###
+
+POST {{host}}/api/match/analyze
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "resumeId": {{resumeId}},
+  "jobId": {{jobId}}
+}
+
+###
+
+GET {{host}}/api/match/history
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{host}}/api/match/{{matchId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{host}}/api/match/{{matchId}}/recommendations
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{host}}/api/dashboard
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="asp.net/asp.net.csproj" />
+  <Project Path="SkillMatch.API.Tests/SkillMatch.API.Tests.csproj" />
+</Solution>
