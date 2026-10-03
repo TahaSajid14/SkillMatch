@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+!React/my-app/.env.development
 
 **/bin/
 **/obj/

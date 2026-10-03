@@ -1,6 +1,5 @@
 import { getToken } from './authApi.js'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5095/api'
+import { API_BASE_URL } from './apiConfig.js'
 
 export function getJobs() {
   return request('/jobs')
@@ -34,7 +33,7 @@ async function request(path, options = {}) {
       },
     })
   } catch {
-    throw new Error('The SkillMatch API is unavailable. Confirm that it is running on port 5095.')
+    throw new Error('The SkillMatch API is unavailable. Please try again shortly.')
   }
 
   const payload = response.status === 204 ? null : await response.json().catch(() => ({}))

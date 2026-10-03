@@ -14,8 +14,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()?
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin.Trim().TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray() ?? [];
+
+if (allowedOrigins.Length == 0)
+{
+    throw new InvalidOperationException("At least one CORS origin must be configured in 'Cors:AllowedOrigins'.");
+}
 
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails();
 builder.Services.AddDbContext<SkillMatchDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -83,8 +96,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ReactDevelopment", policy =>
-        policy.WithOrigins("http://localhost:5173")
+    options.AddPolicy("ReactClient", policy =>
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
@@ -104,9 +117,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseExceptionHandler();
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
-app.UseCors("ReactDevelopment");
+app.UseCors("ReactClient");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

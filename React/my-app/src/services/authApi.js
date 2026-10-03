@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5095/api'
+import { API_BASE_URL } from './apiConfig.js'
+
 const TOKEN_KEY = 'skillmatch_token'
 
 export function getToken() {
@@ -39,7 +40,7 @@ async function authenticate(path, body) {
       body: JSON.stringify(body),
     })
   } catch {
-    throw new Error('The SkillMatch API is unavailable. Start the API and try again.')
+    throw new Error('The SkillMatch API is unavailable. Please try again shortly.')
   }
 
   const payload = await response.json().catch(() => ({}))

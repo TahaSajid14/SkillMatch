@@ -80,6 +80,106 @@ The container stack runs Nginx, the API, and SQL Server. Named volumes preserve 
 database and private resume files, while the API applies EF Core migrations during
 container startup. Do not commit the populated `.env` file.
 
+## Deployment
+
+The production layout keeps the existing technology choices: the React client is
+hosted by Vercel, while the ASP.NET Core API and SQL Server database are hosted by
+MonsterASP.NET. No production credentials belong in this repository.
+
+### Frontend — Vercel
+
+Import this GitHub repository into Vercel with these project settings:
+
+- Root Directory: `React/my-app`
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Install Command: `npm install` (Vercel's default is also suitable)
+
+Set this Vercel environment variable for Production and any Preview environment
+that should call the hosted API:
+
+```env
+VITE_API_URL=https://skillmatch-api.runasp.net
+```
+
+Use the real MonsterASP.NET HTTPS hostname. The frontend normalizes this origin and
+adds `/api`, so the variable may also contain a URL that already ends in `/api`.
+Local development continues to use `http://localhost:5095` through the committed
+non-secret `.env.development`; copy `React/my-app/.env.example` to `.env.local` only
+when an explicit local override is needed. The current UI does not use path-based
+client-side routing, so no Vercel SPA rewrite is required.
+
+### Backend — MonsterASP.NET
+
+Create a .NET 10 website and an MSSQL database in the MonsterASP.NET control panel.
+Publish the API from the repository root with:
+
+```powershell
+dotnet publish Asp.net/asp.net/asp.net/asp.net.csproj -c Release -o artifacts/monsterasp --no-self-contained
+```
+
+Deploy the contents of `artifacts/monsterasp` to the website root using the
+MonsterASP.NET WebDeploy profile (recommended) or SFTP. The generated `web.config`
+starts the framework-dependent application as `dotnet SkillMatch.API.dll` under
+IIS. Enable the free HTTPS certificate before connecting the Vercel frontend.
+
+Configure these values in the hosting control panel or the deployed application's
+environment; `Asp.net/asp.net/asp.net/.env.example` is a reference and is not loaded
+automatically by ASP.NET Core:
+
+```env
+ConnectionStrings__DefaultConnection=<MonsterASP.NET MSSQL connection string>
+Jwt__Key=<at least 32 characters of random secret material>
+Jwt__Issuer=SkillMatch.API
+Jwt__Audience=SkillMatch.Web
+Jwt__ExpirationMinutes=60
+Cors__AllowedOrigins__0=https://skillmatch.vercel.app
+ResumeStorage__Directory=Storage/Resumes
+Database__MigrateOnStartup=false
+```
+
+Replace both example domains with the assigned production hostnames. Add further
+allowed origins using `Cors__AllowedOrigins__1`, `__2`, and so on. Origins must be
+exact HTTPS origins without paths or a trailing slash. Keep automatic migrations
+disabled on the shared host after initial setup; Docker Compose deliberately enables
+them for its single API instance.
+
+Production returns generic problem responses for unhandled exceptions, enables
+HSTS, and keeps Swagger limited to Development. Check the deployed API and database
+with `GET https://<api-host>/api/system/status`.
+
+### Database — MonsterASP.NET MSSQL
+
+Copy the SQL-authentication connection string from the MonsterASP.NET control panel
+into `ConnectionStrings__DefaultConnection`. Do not replace the committed local
+development connection string with this hosted credential or place it in any
+tracked `.env` file. Apply the existing migrations once from
+`Asp.net/asp.net/asp.net`:
+
+```powershell
+dotnet ef database update --connection "<MonsterASP.NET MSSQL connection string>"
+```
+
+The connection string can remain in shell history, so prefer Visual Studio's
+WebDeploy database/migration settings when handling a real credential on a shared
+machine. The migration files remain committed and should not be regenerated.
+
+### CORS and resume-file persistence
+
+The API accepts only configured origins. Local development allows
+`http://localhost:5173`; the production environment variable replaces that entry
+with the exact Vercel origin.
+
+Resume files remain private under the configured `Storage/Resumes/{userId}` path,
+and the directory is created automatically. This is local website storage rather
+than object storage: do not enable a WebDeploy option that removes additional files
+at the destination, and back up the folder before redeployments. A hosting reset,
+account suspension, quota limit, or destructive deployment can otherwise remove
+uploaded resumes even while their database records remain. Confirm the free-plan
+storage and file-retention behavior in the MonsterASP.NET control panel before
+sharing the application publicly.
+
 ## Authentication API
 
 - `POST /api/auth/register` creates an account and returns a JWT.

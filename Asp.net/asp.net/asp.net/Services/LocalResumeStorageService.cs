@@ -15,6 +15,7 @@ public sealed class LocalResumeStorageService : IResumeStorageService
         _storageRoot = Path.GetFullPath(Path.Combine(
             environment.ContentRootPath,
             options.Value.Directory));
+        Directory.CreateDirectory(_storageRoot);
     }
 
     public async Task<StoredResumeFile> SaveAsync(
