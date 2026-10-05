@@ -211,7 +211,7 @@ function Dashboard({ user, onLogout }) {
           <section className="text-preview">
             <div className="section-heading">
               <div><p className="eyebrow">RESUME ANALYSIS</p><h2>{selectedResume.fileName}</h2></div>
-              <div className="preview-actions"><button onClick={() => handleReanalyze(selectedResume.id)}>Re-analyze skills</button><button className="close-button inline-close" onClick={() => setSelectedResume(null)} aria-label="Close resume preview">×</button></div>
+              <div className="preview-actions"><button type="button" onClick={() => handleReanalyze(selectedResume.id)}>Re-analyze skills</button><button className="close-button inline-close" type="button" onClick={() => setSelectedResume(null)} aria-label="Close resume preview">×</button></div>
             </div>
             <div className="detected-skills"><p>Detected skills <strong>{selectedResume.detectedSkills.length}</strong></p><div className="skill-badges">{selectedResume.detectedSkills.length > 0 ? selectedResume.detectedSkills.map((skill) => <span key={skill.id} title={skill.category}>{skill.name}</span>) : <small>No catalog skills detected yet.</small>}</div></div>
             {selectedResume.extractedText ? <pre>{selectedResume.extractedText}</pre> : <p className="empty-state">No selectable text was found. Scanned PDFs require OCR.</p>}

@@ -355,6 +355,15 @@ html { scroll-behavior: smooth; scroll-padding-top: 125px; }
 @keyframes revealBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (max-width: 920px) { .dashboard-hero { grid-template-columns: 1fr; }.career-orbit-wrap { min-height: 330px; margin-top: -15px; }.career-orbit { width: 350px; } }
 @media (max-width: 600px) { .dashboard-content { width: calc(100% - 24px); }.dashboard-hero { min-height: 0; padding: 28px 22px; border-radius: 20px; }.dashboard-hero h1 { font-size: 38px; }.dashboard-hero-copy > p:last-of-type { font-size: 12px; }.hero-quick-stats { width: 100%; }.hero-quick-stats > div { min-width: 0; flex: 1; padding: 10px; }.career-orbit-wrap { min-height: 285px; }.career-orbit { width: 290px; transform: scale(.83) rotateY(-7deg); }.workspace-jump { top: 72px; max-width: calc(100vw - 24px); overflow-x: auto; justify-content: flex-start; }.workspace-jump a { flex: 0 0 auto; padding: 8px 10px; }.dashboard-overview { padding-top: 28px; } }
+@media (max-width: 600px) {
+  .text-preview { padding: 20px; }
+  .text-preview .section-heading { align-items: stretch; flex-direction: column; gap: 14px; }
+  .text-preview .section-heading > div:first-child { min-width: 0; }
+  .text-preview .section-heading h2 { overflow-wrap: anywhere; font-size: 20px; line-height: 1.25; }
+  .preview-actions { width: 100%; gap: 8px; }
+  .preview-actions > button:first-child { min-height: 44px; flex: 1; padding: 11px 14px; border: 1px solid #cfe7dc; border-radius: 9px; font-size: 13px; white-space: nowrap; }
+  .preview-actions .inline-close { width: 44px; min-width: 44px; height: 44px; padding: 0; display: grid; place-items: center; color: #53635c; background: #edf2ef; border-radius: 9px; font-size: 23px; }
+}
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; }.release-chip > span, .orbit-glow, .orbit-ring, .orbit-core, .orbit-float, .profile-track span, .gap-track span, .category-track span { animation: none; }.workspace-jump a, .resume-library, .upload-card, .text-preview, .jobs-workspace, .match-workspace, .analytics-card, .analytics-stat-grid article { transition: none; } }
 
 /* Readability pass */
