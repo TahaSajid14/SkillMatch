@@ -3,8 +3,7 @@ import { login, register } from '../services/authApi.js'
 
 const emptyForm = { fullName: '', email: '', password: '' }
 
-function AuthPanel({ initialMode, onAuthenticated, onClose }) {
-  const [mode, setMode] = useState(initialMode)
+function AuthPanel({ mode, onModeChange, onAuthenticated, onClose, panelRef }) {
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -14,8 +13,8 @@ function AuthPanel({ initialMode, onAuthenticated, onClose }) {
   }
 
   function switchMode(nextMode) {
-    setMode(nextMode)
     setError('')
+    onModeChange(nextMode)
   }
 
   async function handleSubmit(event) {
@@ -38,8 +37,8 @@ function AuthPanel({ initialMode, onAuthenticated, onClose }) {
   const isRegister = mode === 'register'
 
   return (
-    <aside className="auth-card" aria-label={isRegister ? 'Create account' : 'Log in'}>
-      <button className="close-button" onClick={onClose} aria-label="Close authentication form">×</button>
+    <aside className="auth-card" id="authentication" ref={panelRef} aria-label={isRegister ? 'Create account' : 'Log in'}>
+      <button className="close-button" type="button" onClick={onClose} aria-label="Close authentication form">×</button>
       <p className="eyebrow">{isRegister ? 'START YOUR PROFILE' : 'WELCOME BACK'}</p>
       <h2>{isRegister ? 'Create your account' : 'Log in to SkillMatch'}</h2>
       <p className="auth-intro">
@@ -72,7 +71,7 @@ function AuthPanel({ initialMode, onAuthenticated, onClose }) {
 
       <p className="auth-switch">
         {isRegister ? 'Already have an account?' : 'New to SkillMatch?'}{' '}
-        <button onClick={() => switchMode(isRegister ? 'login' : 'register')}>
+        <button type="button" onClick={() => switchMode(isRegister ? 'login' : 'register')}>
           {isRegister ? 'Log in' : 'Create one'}
         </button>
       </p>

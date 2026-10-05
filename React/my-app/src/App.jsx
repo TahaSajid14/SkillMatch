@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AuthPanel from './components/AuthPanel.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import { clearSession, getCurrentUser, getToken } from './services/authApi.js'
@@ -8,6 +8,7 @@ function App() {
   const [user, setUser] = useState(null)
   const [authMode, setAuthMode] = useState(null)
   const [checkingSession, setCheckingSession] = useState(true)
+  const authPanelRef = useRef(null)
 
   useEffect(() => {
     async function restoreSession() {
@@ -27,6 +28,24 @@ function App() {
 
     restoreSession()
   }, [])
+
+  useEffect(() => {
+    if (!authMode || !authPanelRef.current) return
+
+    const panel = authPanelRef.current
+    const panelBounds = panel.getBoundingClientRect()
+    const isFullyVisible = panelBounds.top >= 0 && panelBounds.bottom <= window.innerHeight
+
+    if (!isFullyVisible) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    panel.querySelector('input')?.focus({ preventScroll: true })
+  }, [authMode])
+
+  function openAuth(mode) {
+    setAuthMode(mode)
+  }
 
   function handleLogout() {
     clearSession()
@@ -50,8 +69,8 @@ function App() {
           <span>SkillMatch</span>
         </a>
         <div className="nav-actions">
-          <button className="text-button" onClick={() => setAuthMode('login')}>Log in</button>
-          <button className="nav-button" onClick={() => setAuthMode('register')}>Create account</button>
+          <button className="text-button" type="button" onClick={() => openAuth('login')}>Log in</button>
+          <button className="nav-button" type="button" onClick={() => openAuth('register')}>Create account</button>
         </div>
       </nav>
 
@@ -64,15 +83,21 @@ function App() {
             transparent match scores, and practical learning recommendations.
           </p>
           <div className="actions">
-            <button className="primary-button" onClick={() => setAuthMode('register')}>
+            <button className="primary-button" type="button" onClick={() => openAuth('register')}>
               Create your account <span aria-hidden="true">→</span>
             </button>
-            <button className="secondary-button" onClick={() => setAuthMode('login')}>I already have an account</button>
+            <button className="secondary-button" type="button" onClick={() => openAuth('login')}>I already have an account</button>
           </div>
         </div>
 
         {authMode ? (
-          <AuthPanel key={authMode} initialMode={authMode} onAuthenticated={setUser} onClose={() => setAuthMode(null)} />
+          <AuthPanel
+            mode={authMode}
+            onModeChange={openAuth}
+            onAuthenticated={setUser}
+            onClose={() => setAuthMode(null)}
+            panelRef={authPanelRef}
+          />
         ) : (
           <aside className="preview-card" aria-label="Match result preview">
             <div className="card-header">

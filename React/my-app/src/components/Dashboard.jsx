@@ -184,6 +184,10 @@ function Dashboard({ user, onLogout }) {
           <aside className="upload-card">
             <p className="eyebrow">ADD A RESUME</p><h2>Upload document</h2>
             <p>Drop a file below. Text and known skills are extracted locally.</p>
+            <div className="upload-audience-note" role="note">
+              <span aria-hidden="true">i</span>
+              <p><strong>Best suited for technology careers.</strong> SkillMatch is designed for computer science professionals, programmers, and software developers. Its skill analysis and job matching may be less useful for other career fields.</p>
+            </div>
             <form onSubmit={handleUpload}>
               <div className={`drop-zone ${dragActive ? 'drag-active' : ''}`} role="button" tabIndex="0"
                 onClick={() => fileInputRef.current?.click()}
